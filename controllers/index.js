@@ -25,7 +25,20 @@ class Controllers {
     return res.status(201).json("success register")
   }
 
-  
+  static login( req, res ) {
+    const oneData = firebase.database().ref('/users/')
+    oneData.on('value', (allData) => {
+      allData.val().forEach( data => {
+        if(data.email == req.body.email && data.password == req.body.password){
+          console.log("<<MASUK")
+          return res.status(200).json("login success")
+        }
+      })
+      return res.status(404).json("login data not found")
+    }, function (errorObject) {
+      return res.status(404).json(errorObject)
+    });
+  }
 }
 
 module.exports = Controllers
