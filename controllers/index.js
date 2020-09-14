@@ -1,6 +1,6 @@
 const firebase = require('firebase')
 const firebaseConfig = require('../config/firebaseDB')
-const { encode } = require('../helpers/jwt')
+const { encode, decode } = require('../helpers/jwt')
 
 firebase.initializeApp(firebaseConfig);
 
@@ -41,17 +41,22 @@ class Controllers {
   }
 
   static getProfile( req, res ) {
-    const oneData = firebase.database().ref('/users/')
-    oneData.on('value', (allData) => {
-      allData.val().forEach( data => {
-        if(data.email == req.body.email && data.password == req.body.password){
-          return res.status(200).json("login success")
-        }
-      })
-      return res.status(404).json("login data not found")
-    }, function (errorObject) {
-      return res.status(404).json(errorObject)
-    });
+    try {
+      let userData = decode(req.headers.access_token)
+      
+      const oneData = firebase.database().ref('/users/')
+      oneData.on('value', (allData) => {
+        allData.val().forEach( data => {
+          if(data.email == userData.email){
+            return res.status(200).json(data)
+          }
+        })
+      }, function (errorObject) {
+        return res.status(404).json(errorObject)
+      });
+    } catch (error) {
+      return res.status(404).json("not valid access token")
+    }
   }
 }
 

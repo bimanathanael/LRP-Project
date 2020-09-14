@@ -7,7 +7,6 @@ function encode (data){
 
 function decode (token){
   var decoded = jwt.verify(token, 'sikrit');
-  console.log(decoded) // bar
   return decoded
 }
 
