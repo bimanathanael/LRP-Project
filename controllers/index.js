@@ -5,19 +5,29 @@ const { encode, decode } = require('../helpers/jwt')
 firebase.initializeApp(firebaseConfig);
 
 class Controllers {
+  static checkUser (){
+    let users = firebase.database().ref('/users/')
+    let totalUser = 0
+    users.on('value', async (allData) => {
+      totalUser = await Object.keys(allData.val()).length
+      console.log(totalUser, "<<<<")
+      return totalUser
+    })
+  }
+
   static register( req, res ) {
-    writeUserData(4,req.body.email, req.body.password, req.body.name, req.body.address)
-  
-    function writeUserData(userId,email, password,name, address) {
-      firebase.database().ref('users/' + userId).set({
+    let totalUser = Controllers.checkUser()
+    writeUserData(totalUser,req.body.email, req.body.password, req.body.name, req.body.address)
+
+    function writeUserData(user,email, password,name, address) {
+      firebase.database().ref('users/' + 2).set({
         password: password,
         email: email,
         name: name,
         address: address,
       });
+      return res.status(201).json({message: "success register"})
     }
-
-    return res.status(201).json("success register")
   }
 
   static login( req, res ) {
@@ -35,7 +45,7 @@ class Controllers {
         }
       })
       if(isFound == false){
-        return res.status(404).json("login data not found")
+        return res.status(404).json({message: "login data not found"})
       } 
     });
   }
@@ -55,7 +65,7 @@ class Controllers {
         return res.status(404).json(errorObject)
       });
     } catch (error) {
-      return res.status(404).json("not valid access token")
+      return res.status(404).json({message: "not valid access token"})
     }
   }
 }
