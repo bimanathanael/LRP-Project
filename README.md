@@ -35,6 +35,14 @@ _Response (201)_
 
 ```
 
+_Response (404)_
+```
+{
+  message: "email not valid"
+}
+
+```
+
 
 ### POST /login
 > Login into LRP Project

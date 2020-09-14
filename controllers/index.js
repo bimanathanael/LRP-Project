@@ -1,6 +1,7 @@
 const firebase = require('firebase')
 const firebaseConfig = require('../config/firebaseDB')
 const { encode, decode } = require('../helpers/jwt')
+const validator = require("email-validator");
 
 firebase.initializeApp(firebaseConfig);
 
@@ -16,6 +17,9 @@ class Controllers {
   }
 
   static register( req, res ) {
+    if(validator.validate(req.body.email) == false) {
+      return res.status(404).json({message: "email not valid"})
+    }
     let totalUser = Controllers.checkUser()
     writeUserData(totalUser,req.body.email, req.body.password, req.body.name, req.body.address)
 
